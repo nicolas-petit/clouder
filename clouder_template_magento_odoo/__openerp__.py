@@ -21,7 +21,7 @@
 ##############################################################################
 
 {
-    'name': 'Clouder Template Magento',
+    'name': 'Clouder Template Magento-Odoo',
     'version': '1.0',
     'category': 'Clouder',
     'depends': [
@@ -32,7 +32,7 @@
     'license': 'Other OSI approved licence',
     'website': 'https://github.com/clouder-community/clouder',
     'description': """
-    Clouder Magento
+    Clouder Magento-Odoo
     """,
     'demo': [],
     'data': [
