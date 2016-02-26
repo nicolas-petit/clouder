@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Magento-Odoo super-application -->
+
+        <record id="apptype_magentodoo" model="clouder.application.type">
+            <field name="name">magentodoo</field>
+            <field name="system_user">magentodoo</field>
+        </record>
+
+        <record id="app_magentodoo" model="clouder.application">
+            <field name="name">Magentodoo</field>
+            <field name="code">magentodoo</field>
+            <field name="type_id" ref="apptype_magentodoo"/>
+            <field name="default_image_id" ref="clouder_template_magento.image_magento_data"/>
+            <field name="base" eval="True"/>
+            <field name="current_version">8.0</field>
+        </record>
+
+
+        <!-- Magento side -->
+        <record id="image_magentodoo_magento_files1_9" model="clouder.image">
+            <field name="name">img_magento_magentodoo_files</field>
+            <field name="type_id" ref="clouder_template_magento.apptype_magento"/>
+            <field name="current_version">1.9.2.3</field>
+            <field name="parent_id" ref="clouder.image_base"/>
+            <field name="dockerfile"><![CDATA[
+# Prepare system
+RUN apt-get -qq update && DEBIAN_FRONTEND=noninteractive apt-get -y -qq install wget
+
+# Download and unpack Magento
+RUN cd /tmp && wget https://github.com/OpenMage/magento-mirror/archive/magento-1.9.tar.gz
+RUN cd /tmp && tar -zxvf magento-1.9.tar.gz
+RUN mkdir -p /opt/magento
+RUN mv /tmp/magento-mirror-magento-1.9 /opt/magento/files
+RUN cd /tmp && rm -f magento-*tar.gz
+
+# TODO: add odoo connector magento module
+
+]]></field>
+        </record>
+        <record id="image_magentodoo_magento_files1_9_volume_files" model="clouder.image.volume">
+            <field name="image_id" ref="image_magentodoo_magento_files1_9"/>
+            <field name="name">/opt/magento/files</field>
+            <field name="nosave" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_magento" model="clouder.application">
+            <field name="name">Magentodoo Magento</field>
+            <field name="code">magentodoo_magento</field>
+            <field name="type_id" ref="clouder_template_magento.apptype_magento"/>
+            <field name="default_image_id" ref="clouder_template_magento.image_magento_data"/>
+            <field name="base" eval="True"/>
+            <field name="parent_id" ref="app_magentodoo"/>
+            <field name="required" eval="True"/>
+            <field name="current_version">8.0</field>
+        </record>
+        <record id="app_magentodoo_link_bind" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_magento"/>
+            <field name="name" ref="clouder_template_bind.app_bind"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="base" eval="True"/>
+        </record>
+        <record id="app_magentodoo_link_shinken" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_magento"/>
+            <field name="name" ref="clouder_template_shinken.app_shinken"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="container" eval="True"/>
+            <field name="base" eval="True"/>
+        </record>
+        <record id="app_magentodoo_link_mysql" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_magento"/>
+            <field name="name" ref="clouder_template_mysql.app_mysql"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="make_link" eval="True"/>
+            <field name="service" eval="True"/>
+        </record>
+        <record id="app_magentodoo_link_postfix" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_magento"/>
+            <field name="name" ref="clouder_template_postfix.app_postfix"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="make_link" eval="True"/>
+            <field name="base" eval="True"/>
+        </record>
+        <record id="app_magentodoo_link_proxy" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_magento"/>
+            <field name="name" ref="clouder_template_proxy.app_proxy"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="base" eval="True"/>
+        </record>
+        <record id="app_magentodoo_link_piwik" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_magento"/>
+            <field name="name" ref="clouder_template_piwik.app_piwik"/>
+            <field name="base" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_data" model="clouder.application">
+            <field name="name">Magento Data</field>
+            <field name="code">data</field>
+            <field name="type_id" ref="clouder_template_magento.apptype_magento"/>
+            <field name="parent_id" ref="app_magentodoo_magento"/>
+            <field name="default_image_id" ref="clouder_template_magento.image_magento_data"/>
+            <field name="sequence">1</field>
+            <field name="required" eval="True"/>
+            <field name="autosave" eval="True"/>
+        </record>
+        <record id="app_magentodoo_data_link_mysql" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_data"/>
+            <field name="name" ref="clouder_template_mysql.app_mysql"/>
+            <field name="container" eval="True"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="make_link" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_files" model="clouder.application">
+            <field name="name">Magento Files</field>
+            <field name="code">files</field>
+            <field name="type_id" ref="clouder_template_magento.apptype_magento"/>
+            <field name="parent_id" ref="app_magentodoo_magento"/>
+            <field name="default_image_id" ref="image_magentodoo_magento_files1_9"/>
+            <field name="sequence">2</field>
+            <field name="required" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_exec" model="clouder.application">
+            <field name="name">Magento Exec</field>
+            <field name="code">exec</field>
+            <field name="type_id" ref="clouder_template_magento.apptype_magento"/>
+            <field name="parent_id" ref="app_magentodoo_magento"/>
+            <field name="default_image_id" ref="clouder_template_magento.image_magento_exec"/>
+            <field name="sequence">3</field>
+            <field name="required" eval="True"/>
+        </record>
+        <record id="app_magentodoo_exec_link_mysql" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_exec"/>
+            <field name="name" ref="clouder_template_mysql.app_mysql"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="make_link" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_ssh" model="clouder.application">
+            <field name="name">Magento SSH</field>
+            <field name="code">ssh</field>
+            <field name="type_id" ref="clouder_template_magento.apptype_magento"/>
+            <field name="parent_id" ref="app_magentodoo_magento"/>
+            <field name="default_image_id" ref="clouder_template_magento.image_magento_ssh"/>
+            <field name="sequence">4</field>
+        </record>
+
+
+
+        <!-- Odoo side -->
+
+        <record id="image_magentodoo_odoo_files8" model="clouder.image">
+            <field name="name">img_magentodoo_odoo_files8</field>
+            <field name="type_id" ref="clouder_template_odoo.apptype_odoo"/>
+            <field name="current_version">8.0</field>
+            <field name="parent_id" ref="clouder.image_base"/>
+            <field name="dockerfile"><![CDATA[
+RUN apt-get -qq update && DEBIAN_FRONTEND=noninteractive apt-get -y -qq install git
+
+RUN git clone http://github.com/odoo/odoo.git /opt/odoo/files/odoo -b 8.0
+RUN git clone http://github.com/OCA/connector.git /opt/odoo/files/extra/connector -b 8.0
+
+# TODO: add odoo connector magento module
+
+]]></field>
+        </record>
+        <record id="image_magentodoo_odoo_files8_volume_files" model="clouder.image.volume">
+            <field name="image_id" ref="image_magentodoo_odoo_files8"/>
+            <field name="name">/opt/odoo/files</field>
+            <field name="nosave" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_odoo" model="clouder.application">
+            <field name="name">Magentodoo Odoo</field>
+            <field name="code">magentodoo_odoo</field>
+            <field name="type_id" ref="clouder_template_odoo.apptype_odoo"/>
+            <field name="default_image_id" ref="clouder_template_odoo.image_odoo_data"/>
+            <field name="base" eval="True"/>
+            <field name="parent_id" ref="app_magentodoo"/>
+            <field name="required" eval="True"/>
+            <field name="current_version">8.0</field>
+        </record>
+        <record id="app_magentodoo_odoo_link_bind" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_odoo"/>
+            <field name="name" ref="clouder_template_bind.app_bind"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="base" eval="True"/>
+        </record>
+        <record id="app_magentodoo_odoo_link_shinken" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_odoo"/>
+            <field name="name" ref="clouder_template_shinken.app_shinken"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="container" eval="True"/>
+            <field name="base" eval="True"/>
+        </record>
+        <record id="app_magentodoo_odoo_link_postgres" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_odoo"/>
+            <field name="name" ref="clouder_template_postgres.app_postgres"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="make_link" eval="True"/>
+            <field name="service" eval="True"/>
+        </record>
+        <record id="app_magentodoo_odoo_link_postfix" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_odoo"/>
+            <field name="name" ref="clouder_template_postfix.app_postfix"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="make_link" eval="True"/>
+            <field name="base" eval="True"/>
+        </record>
+        <record id="app_magentodoo_odoo_link_proxy" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_odoo"/>
+            <field name="name" ref="clouder_template_proxy.app_proxy"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="base" eval="True"/>
+        </record>
+        <record id="app_magentodoo_odoo_link_piwik" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_odoo"/>
+            <field name="name" ref="clouder_template_piwik.app_piwik"/>
+            <field name="base" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_odoo_data" model="clouder.application">
+            <field name="name">Odoo Data</field>
+            <field name="code">data</field>
+            <field name="type_id" ref="clouder_template_odoo.apptype_odoo"/>
+            <field name="parent_id" ref="app_magentodoo_odoo"/>
+            <field name="default_image_id" ref="clouder_template_odoo.image_odoo_data"/>
+            <field name="sequence">1</field>
+            <field name="required" eval="True"/>
+            <field name="autosave" eval="True"/>
+        </record>
+        <record id="app_magentodoo_odoo_data_link_postgres" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_odoo_data"/>
+            <field name="name" ref="clouder_template_postgres.app_postgres"/>
+            <field name="container" eval="True"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="make_link" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_odoo_files" model="clouder.application">
+            <field name="name">Odoo Files</field>
+            <field name="code">files</field>
+            <field name="type_id" ref="clouder_template_odoo.apptype_odoo"/>
+            <field name="parent_id" ref="app_magentodoo_odoo"/>
+            <field name="default_image_id" ref="image_magentodoo_odoo_files8"/>
+            <field name="sequence">2</field>
+            <field name="required" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_odoo_exec" model="clouder.application">
+            <field name="name">Odoo Exec</field>
+            <field name="code">exec</field>
+            <field name="type_id" ref="clouder_template_odoo.apptype_odoo"/>
+            <field name="parent_id" ref="app_magentodoo_odoo"/>
+            <field name="default_image_id" ref="clouder_template_odoo.image_odoo_exec"/>
+            <field name="sequence">3</field>
+            <field name="required" eval="True"/>
+        </record>
+        <record id="app_magentodoo_odoo_exec_link_postgres" model="clouder.application.link">
+            <field name="application_id" ref="app_magentodoo_odoo_exec"/>
+            <field name="name" ref="clouder_template_postgres.app_postgres"/>
+            <field name="required" eval="True"/>
+            <field name="auto" eval="True"/>
+            <field name="make_link" eval="True"/>
+        </record>
+
+        <record id="app_magentodoo_odoo_ssh" model="clouder.application">
+            <field name="name">Odoo SSH</field>
+            <field name="code">ssh</field>
+            <field name="type_id" ref="clouder_template_odoo.apptype_odoo"/>
+            <field name="parent_id" ref="app_magentodoo_odoo"/>
+            <field name="default_image_id" ref="clouder_template_odoo.image_odoo_ssh"/>
+            <field name="sequence">4</field>
+        </record>
+
+    </data>
+</openerp>
