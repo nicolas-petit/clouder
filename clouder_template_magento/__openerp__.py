@@ -32,7 +32,7 @@
         'clouder_template_proxy',
         'clouder_template_mysql'
     ],
-    'author': 'Yannick Buron (Clouder)',
+    'author': 'Nicolas Petit (Clouder)',
     'license': 'Other OSI approved licence',
     'website': 'https://github.com/clouder-community/clouder',
     'description': """
