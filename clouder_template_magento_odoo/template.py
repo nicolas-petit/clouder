@@ -24,4 +24,49 @@ from openerp import models, api, modules
 from openerp.exceptions import ValidationError
 
 
+class ClouderContainer(models.Model):
+    """
+    Adds methods to manage magneto specificities.
+    """
+
+    _inherit = 'clouder.container'
+
+    @api.multi
+    def deploy_post(self):
+        super(ClouderContainer, self).deploy_post()
+        if self.application_id.type_id.name == 'magento':
+            if self.application_id.code == 'exec' \
+                    and self.parent_id and self.parent_id.parent_id \
+                    and self.parent_id.parent_id.application_id.code == 'magentodoo':
+
+                # Making directories and installing odoo connector module in magento
+                self.execute([
+                    'mkdir',
+                    '-p',
+                    '/opt/magento/exec/app/code/community'
+                ])
+                self.execute([
+                    'cp',
+                    '-r',
+                    '/opt/magento/magento-module/Openlabs_OpenERPConnector-1.1.0/Openlabs',
+                    '/opt/magento/exec/app/code/community/'
+                ])
+                self.execute([
+                    'mkdir',
+                    '-p',
+                    '/opt/magento/exec/app/etc/modules'
+                ])
+                self.execute([
+                    'cp',
+                    '/opt/magento/magento-module/Openlabs_OpenERPConnector-1.1.0' +
+                    '/Openlabs/app/etc/modules/Openlabs_OpenERPConnector.xml',
+                    '/opt/magento/exec/app/etc/modules/'
+                ])
+                self.execute([
+                    'chown',
+                    '-r',
+                    'www-data:www-data'
+                    '/opt/magento/exec/'
+                ])
+
 

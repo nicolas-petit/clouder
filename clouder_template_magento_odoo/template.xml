@@ -27,7 +27,7 @@
             <field name="parent_id" ref="clouder.image_base"/>
             <field name="dockerfile"><![CDATA[
 # Prepare system
-RUN apt-get -qq update && DEBIAN_FRONTEND=noninteractive apt-get -y -qq install wget
+RUN apt-get -qq update && DEBIAN_FRONTEND=noninteractive apt-get -y -qq install wget bzr
 
 # Download and unpack Magento
 RUN cd /tmp && wget https://github.com/OpenMage/magento-mirror/archive/magento-1.9.tar.gz
@@ -36,7 +36,8 @@ RUN mkdir -p /opt/magento
 RUN mv /tmp/magento-mirror-magento-1.9 /opt/magento/files
 RUN cd /tmp && rm -f magento-*tar.gz
 
-# TODO: add odoo connector magento module
+# Download odoo connector magento module
+RUN cd /opt/matgento && bzr branch lp:magentoerpconnect/magento-module-oerp6.x-stable magento-module
 
 ]]></field>
         </record>
@@ -167,10 +168,12 @@ RUN cd /tmp && rm -f magento-*tar.gz
             <field name="dockerfile"><![CDATA[
 RUN apt-get -qq update && DEBIAN_FRONTEND=noninteractive apt-get -y -qq install git
 
-RUN git clone http://github.com/odoo/odoo.git /opt/odoo/files/odoo -b 8.0
 RUN git clone http://github.com/OCA/connector.git /opt/odoo/files/extra/connector -b 8.0
-
-# TODO: add odoo connector magento module
+RUN git clone git@github.com:OCA/connector-ecommerce.git /opt/odoo/files/extra/connector-ecommerce -b 8.0
+RUN git clone git@github.com:OCA/connector-magento.git /opt/odoo/files/extra/connector-magento -b 8.0
+RUN git clone git@github.com:OCA/e-commerce.git /opt/odoo/files/extra/e-commerce -b 8.0
+RUN git clone git@github.com:OCA/product-attribute.git /opt/odoo/files/extra/product-attribute -b 8.0
+RUN git clone git@github.com:OCA/sale-workflow.git /opt/odoo/files/extra/sale-workflow -b 8.0
 
 ]]></field>
         </record>
