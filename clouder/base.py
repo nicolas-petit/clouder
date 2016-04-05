@@ -429,7 +429,7 @@ class ClouderBase(models.Model):
 
         return vals
 
-    @api.multi
+    @api.one
     @api.onchange('application_id')
     def onchange_application_id(self):
         vals = {
@@ -447,8 +447,7 @@ class ClouderBase(models.Model):
             [('container_id', '=', self.id)]).unlink()
         self.env['clouder.container.child'].search(
             [('container_id', '=', self.id)]).unlink()
-        for key, value in vals.iteritems():
-            setattr(self, key, value)
+        self.write(vals)
 
     @api.multi
     def control_priority(self):

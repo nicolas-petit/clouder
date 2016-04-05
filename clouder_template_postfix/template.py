@@ -57,23 +57,26 @@ class ClouderContainer(models.Model):
             smtp_options = False
             if self.options['smtp_relayhost']['value'] and \
                 self.options['smtp_username']['value'] and \
+                self.options['smtp_host']['value'] and \
                 self.options['smtp_key']['value']:
                 smtp_options = True
 
             if smtp_options:
                 self.execute([
                     'sed', '-i',
-                    '"/relayhost =/d" ' + '/etc/postfix/main.cf']),
+                    '"/relayhost =/d" ' + '/etc/postfix/main.cf'])
                 self.execute([
                     'echo "relayhost = ' + self.options['smtp_relayhost']['value']
                     + '" >> /etc/postfix/main.cf'])
 
             self.execute([
                 'sed', '-i',
-                '"/myorigin =/d" ' + '/etc/postfix/main.cf']),
-            self.execute([
-                'echo "myorigin = ' + self.options['smtp_host']['value'] + 
-                '" >> /etc/postfix/main.cf'])
+                '"/myorigin =/d" ' + '/etc/postfix/main.cf'])
+
+            if smtp_options:
+                self.execute([
+                    'echo "myorigin = ' + self.options['smtp_host']['value'] +
+                    '" >> /etc/postfix/main.cf'])
 
             self.execute([
                 'echo "smtp_sasl_auth_enable = yes" >> /etc/postfix/main.cf'])
@@ -83,7 +86,7 @@ class ClouderContainer(models.Model):
             self.execute(['echo "smtp_use_tls = yes" >> /etc/postfix/main.cf'])
             self.execute([
                 'sed', '-i',
-                '"/mynetworks =/d" ' + '/etc/postfix/main.cf']),
+                '"/mynetworks =/d" ' + '/etc/postfix/main.cf'])
             self.execute([
                 'echo "mynetworks = 127.0.0.0/8 172.17.0.0/16" '
                 '>> /etc/postfix/main.cf'])
