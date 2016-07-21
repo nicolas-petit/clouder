@@ -21,21 +21,18 @@
 ##############################################################################
 
 {
-    'name': 'Clouder Website Payment',
+    'name': 'NPETIT_DEBUG',
     'version': '1.0',
     'category': 'Clouder',
-    'depends': ['clouder_website', 'payment', 'clouder_invoicing'],
-    'author': 'Yannick Buron (Clouder), Nicolas Petit',
-    'license': 'Other OSI approved licence',
-    'website': 'https://github.com/clouder-community/clouder',
+    'depends': ['base'],
+    'author': 'Nicolas Petit',
+    'license': 'NOPELOL',
+    'website': 'NOPELOL',
     'description': """
-    Add payment capabilities to the external form generated in Clouder Website
+    NPETIT_DEBUG
     """,
     'demo': [],
-    'data': [
-        'templates.xml',
-        'clouder_website_payment_data.xml'
-    ],
+    'data': [],
     'installable': True,
     'application': True,
 }
