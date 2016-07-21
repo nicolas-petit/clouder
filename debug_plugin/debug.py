@@ -20,19 +20,18 @@
 #
 ##############################################################################
 
-{
-    'name': 'NPETIT_DEBUG',
-    'version': '1.0',
-    'category': 'Clouder',
-    'depends': ['base'],
-    'author': 'Nicolas Petit',
-    'license': 'NOPELOL',
-    'website': 'NOPELOL',
-    'description': """
-    NPETIT_DEBUG
-    """,
-    'demo': [],
-    'data': [],
-    'installable': True,
-    'application': True,
-}
+import logging
+import pprint
+
+_logger = logging.getLogger(__name__)
+
+
+def npetit_log(msg, level='info'):
+    """
+    Logging function easily accessible by calling from openerp.addons.debug_plugin.debug import npetit_log
+    """
+    getattr(_logger, level)(
+        u"\n\n{0}\n\n".format(
+            pprint.pformat(msg, indent=4)
+        )
+    )

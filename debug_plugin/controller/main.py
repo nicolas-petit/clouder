@@ -41,14 +41,16 @@ class DebugController(http.Controller):
         data = {}
 
         orm_sess = request.env['clouder.web.session'].sudo()
+        orm_user = request.env['res.users'].sudo()
 
         sessions = orm_sess.search([])
-        data = { str(session.id): {
+        data = {str(session.id): {
             'email': session.partner_id.email,
             'state': session.state,
-            '': session,
-
+            'users': [u.login for u in orm_user.search([('partner_id', '=', session.partner_id)])],
         } for session in sessions}
+
+        npetit_log(data)
 
         orm_sess.launch_update_with_invoice()
         orm_sess.create_instances()
