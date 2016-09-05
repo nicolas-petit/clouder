@@ -70,7 +70,7 @@ class ClouderApplicationType(models.Model):
 
     @api.one
     @api.constrains('name', 'system_user')
-    def _validate_data(self):
+    def _check_forbidden_chars_name_sys_user(self):
         """
         Check that the application type name does not contain any forbidden
         characters.
@@ -108,12 +108,25 @@ class ClouderApplicationTypeOption(models.Model):
          'Options name must be unique per apptype!'),
     ]
 
-    @property
-    def get_default(self):
-        res = self.default
+    @api.multi
+    def generate_default(self):
+        res = ''
         if self.name == 'db_password':
             res = model.generate_random_password(20)
+        if self.name == 'secret':
+            res = model.generate_random_password(50)
+        if self.name == 'ssh_privatekey':
+            res = self.env['clouder.server']._default_private_key()
+        if self.name == 'ssh_publickey':
+            res = self.env['clouder.server']._default_public_key()
         return res
+
+    @property
+    def get_default(self):
+        if self.default:
+            return self.default
+        else:
+            return self.generate_default()
 
 
 class ClouderApplication(models.Model):
@@ -132,6 +145,7 @@ class ClouderApplication(models.Model):
     default_image_id = fields.Many2one('clouder.image', 'Default Image',
                                        required=True)
     base = fields.Boolean('Can have base?')
+    next_container_id = fields.Many2one('clouder.container', 'Next container')
     admin_name = fields.Char('Admin name')
     admin_email = fields.Char('Admin email')
     archive_id = fields.Many2one('clouder.container', 'Archive')
@@ -169,7 +183,7 @@ class ClouderApplication(models.Model):
 
     @property
     def fullcode(self):
-        fullcode = self.type_id.name
+        fullcode = self.code
         if self.parent_id:
             fullcode = self.parent_id.fullcode + '-' + self.code
         return fullcode
@@ -235,7 +249,7 @@ class ClouderApplication(models.Model):
 
     @api.one
     @api.constrains('code', 'admin_name', 'admin_email')
-    def _validate_data(self):
+    def _check_forbidden_chars_credentials_code(self):
         """
         Check that the application name does not contain any forbidden
         characters.

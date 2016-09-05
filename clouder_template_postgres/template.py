@@ -127,7 +127,7 @@ class ClouderBase(models.Model):
 
         if self.container_id.db_type == 'pgsql':
             for key, database in self.databases.iteritems():
-                self.container_id.execute(['createdb', '-h',
+                self.container_id.base_backup_container.execute(['createdb', '-h',
                                            self.container_id.db_server, '-U',
                                            self.container_id.db_user, database])
 
@@ -174,7 +174,7 @@ class ClouderSave(models.Model):
                     '-h', self.container_id.db_server,
                     '-U', self.container_id.db_user, database,
                     '>', '/base-backup/' + self.name + '/' +
-                    database + '.dump'],
+                    self.base_dumpfile],
                     username=self.base_id.application_id.type_id.system_user)
         return res
 
